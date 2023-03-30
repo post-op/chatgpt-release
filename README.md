@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
+[![build-test](https://github.com/post-op/chatgpt-release/actions/workflows/test.yml/badge.svg)](https://github.com/post-op/chatgpt-release/actions/workflows/test.yml)
 </p>
 
 # Create a release body from commit messages

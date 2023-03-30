@@ -6,6 +6,9 @@ on: # rebuild any PRs and main branch changes
       - main
       - 'releases/*'
 
+env:
+  OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
+
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
