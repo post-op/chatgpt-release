@@ -2,7 +2,9 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {Configuration, OpenAIApi} from 'openai'
 
-const token: string = process.env.GITHUB_TOKEN ?? ''
+if (!process.env.GITHUB_TOKEN) throw new Error('No GITHUB_TOKEN set')
+
+const token: string = process.env.GITHUB_TOKEN
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY
 })

@@ -38,13 +38,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateRelease = exports.getMessages = exports.getSha = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const openai_1 = __nccwpck_require__(9211);
-const token = (_a = process.env.GITHUB_TOKEN) !== null && _a !== void 0 ? _a : '';
+if (!process.env.GITHUB_TOKEN)
+    throw new Error('No GITHUB_TOKEN set');
+const token = process.env.GITHUB_TOKEN;
 const configuration = new openai_1.Configuration({
     apiKey: process.env.OPENAI_API_KEY
 });
