@@ -1,16 +1,36 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as github from '@actions/github'
+import {generateRelease, getMessages, getSha} from './business'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const version: string = core.getInput('version')
+    const whimsical: boolean = core.getBooleanInput('whimsical')
+    const sha: string = core.getInput('sha') ?? (await getSha())
+    const projectName: string =
+      core.getInput('project_name') ?? github.context.repo.repo
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    core.debug(`Parameters:
+    - version: ${version}
+    - sha: ${sha}
+    - whimsical: ${whimsical}
+    - projectName: ${projectName}
+    `)
 
-    core.setOutput('time', new Date().toTimeString())
+    const messages = await getMessages(sha)
+
+    core.debug(`Messages:
+    ${messages.join('\n')}
+    `)
+
+    const releaseBody = await generateRelease(
+      version,
+      projectName,
+      messages,
+      whimsical
+    )
+
+    core.setOutput('release_body', releaseBody)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

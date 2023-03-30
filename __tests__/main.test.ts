@@ -1,29 +1,61 @@
-import {wait} from '../src/wait'
 import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
-import {expect, test} from '@jest/globals'
+import {expect, test, describe} from '@jest/globals'
+import {getSha, getMessages} from '../src/business'
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
+import nock from 'nock'
+process.env.GITHUB_REPOSITORY = "owner/repo"
+
+describe('getSha', () => {
+  test('returns the target commitish of the latest release', async () => {
+    // Mock the GitHub API response
+    const expectedSha = 'abcdef123456'
+    nock('https://api.github.com')
+    .get('/repos/owner/repo/releases/latest')
+    .reply(200, { target_commitish: expectedSha })
+
+    // Call the function and verify the result
+    const sha = await getSha()
+    expect(sha).toBe(expectedSha)
+  })
+
+  test('returns "main" if there is no release', async () => {
+    // Set up the mock HTTP response
+    nock('https://api.github.com')
+      .get('/repos/owner/repo/releases/latest')
+      .reply(404)
+
+    // Call the function and verify the result
+    const sha = await getSha()
+    expect(sha).toBe('main')
+  })
 })
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
-})
+describe('getMessages', () => {
+  test('returns the commit messages for a given SHA', async () => {
+    // Set up the mock HTTP response
+    const sha = 'abcdef123456'
+    const expectedMessages = [
+      'Fix issue #123',
+      'Add feature X',
+      'Update dependencies'
+    ]
+    nock('https://api.github.com')
+      .get(`/repos/owner/repo/commits?sha=${sha}`)
+      .reply(200, expectedMessages.map(message => ({ commit: { message } })))
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
-  const np = process.execPath
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecFileSyncOptions = {
-    env: process.env
-  }
-  console.log(cp.execFileSync(np, [ip], options).toString())
+    // Call the function and verify the result
+    const messages = await getMessages(sha)
+    expect(messages).toEqual(expectedMessages)
+  })
+
+  test('throws an error if the API returns nothing', async () => {
+    // Set up the mock HTTP response
+    const sha = 'abcdef123456'
+    nock('https://api.github.com')
+      .get(`/repos/owner/repo/commits?sha=${sha}`)
+      .reply(500)
+
+    // Call the function and expect it to throw an error
+    await expect(getMessages(sha)).rejects.toThrow()
+  })
 })

@@ -1,11 +1,20 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'ChatGPT release text'
+description: 'Create a release body using ChatGPT'
+author: 'Post Op'
 inputs:
-  milliseconds: # change this
+  version:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'the release name'
+  whimsical:
+    required: false
+    description: 'whether to create a plain release text or a whimsical one'
+    default: 'false'
+  sha:
+    required: false
+    description: 'the starting sha or committish for getting commit messages. uses the latest release as base or the whole of main if there are no releases'
+  project_name:
+    required: false
+    description: 'the project name to communicate to ChatGPT, uses the repo name if not set'
 runs:
   using: 'node16'
   main: 'dist/index.js'
