@@ -6,7 +6,7 @@ This action asks ChatGPT to create a release message from your commit messages.
 
 ## Requirements
 
-This action requires an OpenAI token in the environment variable OPENAI_API_KEY
+This action requires an OpenAI token in the environment variable `OPENAI_API_KEY`. You also need to pass a github token in the variable `GITHUB_TOKEN`. Note that you can normally use `${{secrets.GITHUB_TOKEN}}` for this, which is automatically set.
 
 ## Usage
 
@@ -16,6 +16,9 @@ Add the following entry to your Github workflow YAML file with the required inpu
 uses: post-op/chatgpt-release@v1
 with:
   version: 'v1.0.23'
+env:
+  OPENAI_API_KEY: 'xxxxx'
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 ```
 
 ## Action Inputs
