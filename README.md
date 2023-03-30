@@ -1,6 +1,4 @@
-<p align="center">
 [![build-test](https://github.com/post-op/chatgpt-release/actions/workflows/test.yml/badge.svg)](https://github.com/post-op/chatgpt-release/actions/workflows/test.yml)
-</p>
 
 # Create a release body from commit messages
 
