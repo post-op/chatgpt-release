@@ -6,7 +6,7 @@ This action asks ChatGPT to create a release message from your commit messages.
 
 ## Requirements
 
-This action requires an OpenAI token in the environment variable OPENAI_TOKEN
+This action requires an OpenAI token in the environment variable OPENAI_API_KEY
 
 ## Usage
 
