@@ -3,15 +3,15 @@ import {expect, test, describe} from '@jest/globals'
 import {getSha, getMessages} from '../src/business'
 
 import nock from 'nock'
-process.env.GITHUB_REPOSITORY = "owner/repo"
+process.env.GITHUB_REPOSITORY = 'owner/repo'
 
 describe('getSha', () => {
   test('returns the target commitish of the latest release', async () => {
     // Mock the GitHub API response
     const expectedSha = 'abcdef123456'
     nock('https://api.github.com')
-    .get('/repos/owner/repo/releases/latest')
-    .reply(200, { target_commitish: expectedSha })
+      .get('/repos/owner/repo/releases/latest')
+      .reply(200, {target_commitish: expectedSha})
 
     // Call the function and verify the result
     const sha = await getSha()
@@ -41,7 +41,10 @@ describe('getMessages', () => {
     ]
     nock('https://api.github.com')
       .get(`/repos/owner/repo/commits?sha=${sha}`)
-      .reply(200, expectedMessages.map(message => ({ commit: { message } })))
+      .reply(
+        200,
+        expectedMessages.map(message => ({commit: {message}}))
+      )
 
     // Call the function and verify the result
     const messages = await getMessages(sha)
