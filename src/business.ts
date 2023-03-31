@@ -19,7 +19,7 @@ export async function getSha(): Promise<string> {
       })
     return latestRelease.target_commitish
   } catch (error) {
-    core.error('No release found, defaulting to `main`.')
+    core.warning('No release found, defaulting to `main`.')
     core.debug(`${error}`)
     return 'main'
   }
@@ -37,7 +37,7 @@ export async function getMessages(sha: string): Promise<string[]> {
     if (!commits) throw new Error('no new commits found')
     return commits.map(commit => commit.commit.message)
   } catch (error) {
-    core.error('No messages found.')
+    core.warning('No messages found.')
     core.debug(`${error}`)
     throw error
   }
@@ -74,9 +74,17 @@ export async function generateRelease(
     )
       throw new Error('Empty response')
     return completions.data.choices[0].text.trim()
-  } catch (error) {
-    core.error('Something went wrong with OpenAI API.')
-    core.error(`${error}`)
-    throw error
+
+    // TypeScript sometimes sucks. This is one such case.
+    // Using unknown and not any here is a bloodbath of `if`s.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.response) {
+      core.error(error.response.status)
+      core.debug(error.response.data)
+    } else {
+      core.error(error.message)
+    }
+    throw new Error('Something went wrong with the OpenAI API.')
   }
 }
