@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {Configuration, OpenAIApi} from 'openai'
+import {isNullOrWhitespace} from './stringsHelper'
 
 if (!process.env.GITHUB_TOKEN) throw new Error('No GITHUB_TOKEN set')
 
@@ -47,13 +48,19 @@ export async function generateRelease(
   releaseName: string,
   projectName: string,
   messages: string[],
-  whimsical: boolean
+  whimsical: boolean,
+  language: string
 ): Promise<string> {
   const openai = new OpenAIApi(configuration)
   const jointMessages = messages.join('\n')
+
+  const languagePrompt = !isNullOrWhitespace(language)
+    ? `Write the message using the ${language} language.`
+    : null
+
   const prompt = whimsical
-    ? `Generate release notes for version ${releaseName}. The project name is ${projectName}. The tone should be fun and whimsical, yet informative. Use the following commit messages:\n\n${jointMessages}\n\n`
-    : `Generate release notes for version ${releaseName}, for project ${projectName}, based on the following commit messages:\n\n${process.env.COMMIT_MESSAGES}\n\n`
+    ? `Generate release notes for version ${releaseName}. The project name is ${projectName}. The tone should be fun and whimsical, yet informative. Use the following commit messages:\n\n${jointMessages}\n\n. ${languagePrompt}`
+    : `Generate release notes for version ${releaseName}, for project ${projectName}, based on the following commit messages:\n\n${process.env.COMMIT_MESSAGES}\n\n. ${languagePrompt}`
   try {
     const completions = await openai.createCompletion({
       model: 'text-davinci-003',
