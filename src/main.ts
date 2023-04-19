@@ -9,12 +9,14 @@ async function run(): Promise<void> {
     const sha: string = core.getInput('sha') ?? (await getSha())
     const projectName: string =
       core.getInput('project_name') ?? github.context.repo.repo
+    const language: string = core.getInput('language')
 
     core.debug(`Parameters:
     - version: ${version}
     - sha: ${sha}
     - whimsical: ${whimsical}
     - projectName: ${projectName}
+    - language: ${language}
     `)
 
     const messages = await getMessages(sha)
@@ -27,7 +29,8 @@ async function run(): Promise<void> {
       version,
       projectName,
       messages,
-      whimsical
+      whimsical,
+      language
     )
 
     core.setOutput('release_body', releaseBody)

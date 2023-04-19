@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {Configuration, OpenAIApi} from 'openai'
+import {isNullOrWhitespace} from './stringsHelper'
+import {throwIfLanguageIsNotSupported} from './supportedLanguages'
 
 if (!process.env.GITHUB_TOKEN) throw new Error('No GITHUB_TOKEN set')
 
@@ -47,13 +49,26 @@ export async function generateRelease(
   releaseName: string,
   projectName: string,
   messages: string[],
-  whimsical: boolean
+  whimsical: boolean,
+  language: string
 ): Promise<string> {
   const openai = new OpenAIApi(configuration)
   const jointMessages = messages.join('\n')
-  const prompt = whimsical
-    ? `Generate release notes for version ${releaseName}. The project name is ${projectName}. The tone should be fun and whimsical, yet informative. Use the following commit messages:\n\n${jointMessages}\n\n`
-    : `Generate release notes for version ${releaseName}, for project ${projectName}, based on the following commit messages:\n\n${process.env.COMMIT_MESSAGES}\n\n`
+
+  const generateReleaseNotesPromptWithoutLanguageSpecification = whimsical
+    ? `Generate release notes for version ${releaseName}. The project name is ${projectName}. The tone should be fun and whimsical, yet informative. Use the following commit messages:\n\n${jointMessages}`
+    : `Generate release notes for version ${releaseName}, for project ${projectName}, based on the following commit messages:\n\n${process.env.COMMIT_MESSAGES}`
+
+  let languagePrompt: string | null = null
+  if (!isNullOrWhitespace(language)) {
+    throwIfLanguageIsNotSupported(language)
+    languagePrompt = `translate the message to ${language}`
+  }
+
+  const prompt = languagePrompt
+    ? `Please first ${generateReleaseNotesPromptWithoutLanguageSpecification} and then ${languagePrompt}`
+    : generateReleaseNotesPromptWithoutLanguageSpecification
+
   try {
     const completions = await openai.createCompletion({
       model: 'text-davinci-003',

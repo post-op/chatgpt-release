@@ -23,12 +23,14 @@ env:
 
 ## Action Inputs
 
-| Input | Required | Description |
-| --- | --- | --- |
-| `version` | Yes | The version number or release name (string) |
-| `whimsical` | No | Whether to create a plain release text or a whimsical one (boolean) |
-| `sha` | No | The starting sha or committish for getting commit messages. uses the latest release as base or the whole of main if there are no releases (string) |
-| `project_name` | No | The project name to communicate to ChatGPT, uses the repo name if not set (string) |
+| Input | Required | Description                                                                                                                                                                                                                                                               |
+| --- | --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `version` | Yes | The version number or release name (string)                                                                                                                                                                                                                               |
+| `whimsical` | No | Whether to create a plain release text or a whimsical one (boolean)                                                                                                                                                                                                       |
+| `sha` | No | The starting sha or committish for getting commit messages. uses the latest release as base or the whole of main if there are no releases (string)                                                                                                                        |
+| `project_name` | No | The project name to communicate to ChatGPT, uses the repo name if not set (string)                                                                                                                                                                                        |
+| `language` | No | The language in which the release text has to be written. `english` if not set. (string)<br/>Supported languages are: <br/>- `english`<br/>- `spanish`<br/>-  `french`<br/>- `german`<br/>- `italian`<br/>- `portuguese`<br/>- `russian`<br/>- `japanese`<br/>- `chinese` |
+
 
 ## Build and Test this Action Locally
 
