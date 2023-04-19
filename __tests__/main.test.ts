@@ -132,3 +132,58 @@ describe('isNullOrWhitespace', () => {
     expect(result2).toBe(true);
   });
 })
+
+
+describe('throwIfLanguageIsNotSupported', () => {
+  test('should throw an error for unsupported language', () => {
+    expect(() => {
+      throwIfLanguageIsNotSupported('italiano');
+    }).toThrowError('Language italiano is not supported.');
+
+    expect(() => {
+      throwIfLanguageIsNotSupported('abcde');
+    }).toThrowError('Language abcde is not supported.');
+  });
+
+  test('should not throw an error for supported language', () => {
+    expect(() => {
+      throwIfLanguageIsNotSupported('german');
+    }).not.toThrow();
+  });
+
+  test('should not throw an error for supported language with front and end spaces', () => {
+    expect(() => {
+      throwIfLanguageIsNotSupported('    english');
+    }).not.toThrow();
+    expect(() => {
+      throwIfLanguageIsNotSupported('english     ');
+    }).not.toThrow();
+    expect(() => {
+      throwIfLanguageIsNotSupported('    english     ');
+    }).not.toThrow();
+  });
+
+  test('should not throw an error for all supported languages', () => {
+    supportedLanguages.forEach((language) => {
+      expect(() => {
+        throwIfLanguageIsNotSupported(language);
+      }).not.toThrow();
+    });
+  });
+
+  test('should ignore case when checking supported languages', () => {
+    expect(() => {
+      throwIfLanguageIsNotSupported('SpaNisH');
+    }).not.toThrow();
+  });
+
+  test('should throw an error for empty or whitespace string language', () => {
+    expect(() => {
+      throwIfLanguageIsNotSupported('');
+    }).toThrowError('Language  is not supported.');
+    expect(() => {
+      throwIfLanguageIsNotSupported('    ');
+    }).toThrowError('Language      is not supported.');
+  });
+
+})

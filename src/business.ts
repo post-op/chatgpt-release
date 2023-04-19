@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {Configuration, OpenAIApi} from 'openai'
 import {isNullOrWhitespace} from './stringsHelper'
+import { throwIfLanguageIsNotSupported } from "./supportedLanguages";
 
 if (!process.env.GITHUB_TOKEN) throw new Error('No GITHUB_TOKEN set')
 
@@ -54,9 +55,11 @@ export async function generateRelease(
   const openai = new OpenAIApi(configuration)
   const jointMessages = messages.join('\n')
 
-  const languagePrompt = !isNullOrWhitespace(language)
-    ? `Write the message using the ${language} language.`
-    : null
+  let languagePrompt: string | null = null
+  if (!isNullOrWhitespace(language)) {
+    throwIfLanguageIsNotSupported(language)
+    languagePrompt = `Write the message using the ${language} language.`
+  }
 
   const prompt = whimsical
     ? `Generate release notes for version ${releaseName}. The project name is ${projectName}. The tone should be fun and whimsical, yet informative. Use the following commit messages:\n\n${jointMessages}\n\n. ${languagePrompt}`
